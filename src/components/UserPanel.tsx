@@ -197,7 +197,7 @@ export default function UserPanel() {
 
   // Delete account completely
   const handleDeleteAccount = async () => {
-    const confirm = window.confirm("ATENÇÃO: Tem certeza absoluta que deseja excluir permanentemente sua conta BackHat AI? Todos os seus dados serão deletados e essa ação não poderá ser desfeita!");
+    const confirm = window.confirm("ATENÇÃO: Tem certeza absoluta que deseja excluir permanentemente sua conta BLACKHAT AI? Todos os seus dados serão deletados e essa ação não poderá ser desfeita!");
     if (!confirm || !user) return;
 
     try {
@@ -725,7 +725,7 @@ export default function UserPanel() {
                         }`}
                       >
                         <div className="flex justify-between text-[9px] text-zinc-500 font-mono mb-1 gap-4">
-                          <strong>{reply.sender === "admin" ? "Suporte Técnico BackHat" : "Você"}</strong>
+                          <strong>{reply.sender === "admin" ? "Suporte Técnico BLACKHAT" : "Você"}</strong>
                           <span>{new Date(reply.createdAt).toLocaleDateString("pt-BR")}</span>
                         </div>
                         <p className="leading-relaxed">{reply.message}</p>

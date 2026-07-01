@@ -197,7 +197,7 @@ export default function AITools() {
         // Music generator audio synthesiser (HTML5 Web Audio API)
         setTimeout(async () => {
           // Play a soothing procedural synth tone
-          setAiResponse(`Trilha sonora sintetizada com IA!\nNome: BackHat Synth Loops\nRitmo: ${promptInput}`);
+          setAiResponse(`Trilha sonora sintetizada com IA!\nNome: BLACKHAT Synth Loops\nRitmo: ${promptInput}`);
           setIsGenerating(false);
           await updateUsageCounts();
           await addSystemLog("AI_GENERATE", `Música gerada com ferramenta ${activeTool.name}`);
@@ -219,7 +219,7 @@ export default function AITools() {
       } else if (activeTool.id === "subtitle") {
         // Uploaded transcription mock
         setTimeout(async () => {
-          const trans = `[00:01] Olá a todos, bem-vindos ao futuro tecnológico.\n[00:03] Esta é uma gravação automática transcrita pela inteligência de elite da BackHat AI.\n[00:06] Criptografia de ponta a ponta e inteligência avançada integradas em um só lugar.`;
+          const trans = `[00:01] Olá a todos, bem-vindos ao futuro tecnológico.\n[00:03] Esta é uma gravação automática transcrita pela inteligência de elite da BLACKHAT AI.\n[00:06] Criptografia de ponta a ponta e inteligência avançada integradas em um só lugar.`;
           setAiResponse(trans);
           setIsGenerating(false);
           await updateUsageCounts();
@@ -227,10 +227,10 @@ export default function AITools() {
 
       } else {
         // Text tool OpenRouter API Proxy call
-        let systemPrompt = "Você é um assistente de inteligência artificial experiente e de alto desempenho chamado BackHat AI. Responda em português de forma extremamente técnica, clara, polida e útil. Use formatação markdown.";
+        let systemPrompt = "Você é um assistente de inteligência artificial experiente e de alto desempenho chamado BLACKHAT AI. Responda em português de forma extremamente técnica, clara, polida e útil. Use formatação markdown.";
         
         if (activeTool.id === "code-gen") {
-          systemPrompt = "Você é um Engenheiro de Software Sênior especialista em BackHat AI. Forneça explicações extremamente eficientes, códigos limpos e funcionais com comentários explicativos.";
+          systemPrompt = "Você é um Engenheiro de Software Sênior especialista em BLACKHAT AI. Forneça explicações extremamente eficientes, códigos limpos e funcionais com comentários explicativos.";
         } else if (activeTool.id === "copywriter") {
           systemPrompt = "Você é um Copywriter profissional altamente experiente. Use técnicas de escrita persuasiva como AIDA ou PAS para criar copies perfeitas de anúncios e conversão.";
         } else if (activeTool.id === "seo") {
@@ -574,7 +574,7 @@ export default function AITools() {
                       />
                       <a
                         href={generatedImg}
-                        download="BackHat_AI_Image.jpg"
+                        download="BLACKHAT_AI_Image.jpg"
                         target="_blank"
                         rel="noreferrer"
                         className="self-start inline-flex items-center gap-1.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 bg-white hover:bg-zinc-150 dark:bg-zinc-900 dark:hover:bg-zinc-850 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow"

@@ -52,7 +52,7 @@ export default function AdminPanel() {
   const [blogTitle, setBlogTitle] = useState("");
   const [blogContent, setBlogContent] = useState("");
   const [blogCategory, setBlogCategory] = useState("Inteligência Artificial");
-  const [blogAuthor, setBlogAuthor] = useState("Redação BackHat AI");
+  const [blogAuthor, setBlogAuthor] = useState("Redação BLACKHAT AI");
   const [blogImg, setBlogImg] = useState("");
   const [blogSeoTitle, setBlogSeoTitle] = useState("");
   const [blogSeoDesc, setBlogSeoDesc] = useState("");
@@ -62,7 +62,7 @@ export default function AdminPanel() {
   const [socialForm, setSocialForm] = useState<SocialLinks>({ ...socials });
   
   // SEO global settings
-  const [globalSeoTitle, setGlobalSeoTitle] = useState("BackHat AI - Plataforma de Inteligência Artificial de Elite");
+  const [globalSeoTitle, setGlobalSeoTitle] = useState("BLACKHAT AI - Plataforma de Inteligência Artificial de Elite");
   const [globalSeoDesc, setGlobalSeoDesc] = useState("Suíte completa contendo mais de 19 ferramentas de Inteligência Artificial de elite para criadores, copywriters e desenvolvedores.");
   const [globalSeoKeywords, setGlobalSeoKeywords] = useState("inteligência artificial, copy, gerador de imagem, suno ai, midi, srt");
 
@@ -329,7 +329,7 @@ export default function AdminPanel() {
               AD
             </div>
             <div>
-              <h4 className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider font-mono">BackHat Admin</h4>
+              <h4 className="text-xs font-black text-zinc-900 dark:text-white uppercase tracking-wider font-mono">BLACKHAT Admin</h4>
               <span className="text-[9px] text-red-500 font-bold uppercase font-mono tracking-widest animate-pulse">
                 Sessão Master
               </span>

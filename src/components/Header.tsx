@@ -49,7 +49,7 @@ export default function Header({ onOpenAuth }: HeaderProps) {
             </div>
           </div>
           <span className="font-sans font-bold tracking-tighter shrink-0">
-            BackHat <span className="text-cyan-500 dark:text-cyan-400 group-hover:text-cyan-300 transition-colors">AI</span>
+            BLACKHAT <span className="text-cyan-500 dark:text-cyan-400 group-hover:text-cyan-300 transition-colors">AI</span>
           </span>
           <span className="hidden sm:inline-block ml-3 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-500 dark:text-cyan-400 font-mono">PROD_v2.4</span>
         </button>

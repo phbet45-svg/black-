@@ -58,7 +58,7 @@ export default function Auth({ isOpen, onClose, initialType }: AuthProps) {
         // WhatsApp message composition
         const storeWaLink = socials?.whatsapp || "https://wa.me/5511999999999";
         const baseUrl = storeWaLink.includes("?") ? storeWaLink.split("?")[0] : storeWaLink;
-        const message = `Olá! Acabei de me cadastrar na BackHat AI e gostaria de ativar meu plano.
+        const message = `Olá! Acabei de me cadastrar na BLACKHAT AI e gostaria de ativar meu plano.
 
 Aqui estão os detalhes do meu cadastro:
 - Nome: ${name}
@@ -186,7 +186,7 @@ Por favor, ative meu acesso! Obrigado.`;
                   <Shield className="w-5 h-5 fill-white" />
                 </div>
                 <span className="font-black tracking-widest text-lg text-zinc-900 dark:text-white uppercase">
-                  Back<span className="text-red-500">Hat</span> AI
+                  BLACK<span className="text-red-500">HAT</span> AI
                 </span>
               </div>
 

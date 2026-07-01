@@ -8,16 +8,16 @@ const PORT = 3000;
 app.use(express.json());
 
 // OpenRouter API Configuration
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-
-if (!OPENROUTER_API_KEY) {
-  console.error("ERRO: OPENROUTER_API_KEY não configurado.");
+function getOpenRouterApiKey(): string | undefined {
+  return process.env.OPENROUTER_API_KEY;
 }
 
 // API Route for AI Proxy
 app.post("/api/ai", async (req, res) => {
+  const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY) {
-    return res.status(500).json({ error: "Erro de configuração: OPENROUTER_API_KEY não definida no servidor." });
+    console.error("ERRO: OPENROUTER_API_KEY não configurada no servidor.");
+    return res.status(500).json({ error: "Erro de configuração: Chave de API não definida no servidor." });
   }
   try {
     const { prompt, systemPrompt, toolId, model } = req.body;

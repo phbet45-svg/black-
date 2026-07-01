@@ -110,7 +110,7 @@ export default function LandingPage({ onOpenAuth }: LandingPageProps) {
   };
 
   const faqs = [
-    { q: "O que é a BackHat AI?", a: "A BackHat AI é uma suíte completa de Inteligência Artificial avançada que reúne mais de 19 ferramentas de geração de texto, código, imagens, trilhas sonoras e roteiros em um único ecossistema seguro e de alta performance." },
+    { q: "O que é a BLACKHAT AI?", a: "A BLACKHAT AI é uma suíte completa de Inteligência Artificial avançada que reúne mais de 19 ferramentas de geração de texto, código, imagens, trilhas sonoras e roteiros em um único ecossistema seguro e de alta performance." },
     { q: "Quais são as limitações de cada plano?", a: "O Plano Básico dá acesso a recursos essenciais com limites mensais (50 imagens, 20 músicas, 10 vídeos, 100 textos). O Plano Médio aumenta significativamente esses limites (200 imagens, 100 músicas, 50 vídeos, 1000 textos). Já o Plano Premium é ilimitado e conta com prioridade máxima de processamento." },
     { q: "Os pagamentos são recorrentes?", a: "Sim, os planos são assinaturas mensais recorrentes sem fidelidade, podendo ser cancelados ou alterados a qualquer momento pelo painel do usuário de forma 100% autônoma." },
     { q: "Minhas informações e prompts estão protegidos?", a: "Absolutamente. Toda a nossa infraestrutura roda sobre servidores seguros do Firebase com criptografia de ponta a ponta (AES-256) garantindo total privacidade sobre as informações." }
@@ -141,7 +141,7 @@ export default function LandingPage({ onOpenAuth }: LandingPageProps) {
           </div>
 
           <h1 className="text-5xl md:text-8xl font-black tracking-widest uppercase font-mono relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 drop-shadow-[0_0_30px_rgba(16,185,129,0.5)] animate-pulse">
-            BACKHAT AI
+            BLACKHAT AI
           </h1>
 
           {/* Hacker Terminal Emulator */}
@@ -205,7 +205,7 @@ export default function LandingPage({ onOpenAuth }: LandingPageProps) {
             <span className="text-[10px] font-bold text-cyan-500 uppercase tracking-widest font-mono">Infraestrutura Blindada</span>
             <h2 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white uppercase tracking-wider font-sans">Alta Performance Sem Compromissos</h2>
             <p className="text-xs text-zinc-500 dark:text-slate-400 leading-relaxed">
-              Diferente de outras plataformas instáveis, a BackHat AI utiliza conexões de canais diretos integrados de alta velocidade para garantir respostas fluidas. Nossa plataforma é totalmente integrada aos servidores do Firebase Firestore para garantir que todo o seu histórico e preferences de prompts estejam salvos em nuvem de forma redundante.
+              Diferente de outras plataformas instáveis, a BLACKHAT AI utiliza conexões de canais diretos integrados de alta velocidade para garantir respostas fluidas. Nossa plataforma é totalmente integrada aos servidores do Firebase Firestore para garantir que todo o seu histórico e preferences de prompts estejam salvos em nuvem de forma redundante.
             </p>
 
             <div className="grid grid-cols-2 gap-4 mt-2">

@@ -43,7 +43,7 @@ export default function Footer() {
               </div>
             </div>
             <span className="font-sans font-bold tracking-tighter shrink-0">
-              BackHat <span className="text-cyan-500 dark:text-cyan-400">AI</span>
+              BLACKHAT <span className="text-cyan-500 dark:text-cyan-400">AI</span>
             </span>
           </button>
           <p className="text-xs text-zinc-500 dark:text-slate-400 leading-relaxed">
@@ -129,7 +129,7 @@ export default function Footer() {
       {/* Copyright area */}
       <div className="max-w-7xl mx-auto px-6 border-t border-zinc-200 dark:border-white/5 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-zinc-400 dark:text-slate-500">
         <div>
-          © 2026 BackHat AI. Todos os direitos reservados.
+          © 2026 BLACKHAT AI. Todos os direitos reservados.
         </div>
         <div className="flex items-center gap-4">
           <span className="hover:text-cyan-500 dark:hover:text-cyan-400 cursor-pointer">Termos de Uso</span>

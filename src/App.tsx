@@ -39,7 +39,7 @@ function MainApp() {
           return (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center animate-fade-in min-h-[60vh]">
               <h2 className="text-xl font-bold uppercase font-mono mb-2">Acesso Restrito</h2>
-              <p className="text-xs text-zinc-500 mb-6">Por favor, efetue seu login para acessar o painel do assinante BackHat AI.</p>
+              <p className="text-xs text-zinc-500 mb-6">Por favor, efetue seu login para acessar o painel do assinante BLACKHAT AI.</p>
               <button
                 onClick={() => openAuth("login")}
                 className="h-10 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-6 rounded-xl shadow cursor-pointer"
@@ -58,7 +58,7 @@ function MainApp() {
           return (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center animate-fade-in min-h-[60vh]">
               <h2 className="text-xl font-bold uppercase font-mono text-red-500 mb-2">Acesso Negado</h2>
-              <p className="text-xs text-zinc-500 mb-6">Esta área é restrita aos Engenheiros de Operações da BackHat AI.</p>
+              <p className="text-xs text-zinc-500 mb-6">Esta área é restrita aos Engenheiros de Operações da BLACKHAT AI.</p>
               <button
                 onClick={() => openAuth("login")}
                 className="h-10 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold px-6 rounded-xl cursor-pointer"

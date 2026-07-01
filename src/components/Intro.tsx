@@ -82,7 +82,7 @@ export default function Intro() {
           className="text-center"
         >
           <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-blue-500 tracking-widest uppercase">
-            BackHat AI
+            BLACKHAT AI
           </h1>
         </motion.div>
 
