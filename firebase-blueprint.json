@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile and usage limit details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "planId": { "type": "string" },
+        "isBlocked": { "type": "boolean" },
+        "credits": { "type": "integer" },
+        "dailyLimit": { "type": "integer" },
+        "monthlyLimit": { "type": "integer" },
+        "storageLimitGB": { "type": "integer" },
+        "textCount": { "type": "integer" },
+        "imageCount": { "type": "integer" },
+        "musicCount": { "type": "integer" },
+        "videoCount": { "type": "integer" },
+        "storageUsedMB": { "type": "integer" },
+        "createdAt": { "type": "string" },
+        "phone": { "type": "string" },
+        "company": { "type": "string" }
+      },
+      "required": ["uid", "email", "displayName", "role", "planId", "isBlocked", "credits", "createdAt"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Subscription and checkout payment records",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "planId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["userId", "userEmail", "planId", "amount", "status", "date"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Customer support tickets and reply threads",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "replies": { "type": "array" }
+      },
+      "required": ["userId", "userEmail", "subject", "message", "status", "createdAt"]
+    },
+    "SystemLog": {
+      "title": "SystemLog",
+      "description": "Audit trails of system activities",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "details": { "type": "string" }
+      },
+      "required": ["userId", "userEmail", "action", "timestamp", "details"]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "Blog posts and comments",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "author": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "seoTitle": { "type": "string" },
+        "seoDesc": { "type": "string" },
+        "seoKeywords": { "type": "string" },
+        "comments": { "type": "array" }
+      },
+      "required": ["title", "content", "category", "author", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and permissions mapping"
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Financial transaction history"
+    },
+    "/support/{ticketId}": {
+      "schema": "SupportTicket",
+      "description": "Support request records"
+    },
+    "/logs/{logId}": {
+      "schema": "SystemLog",
+      "description": "Operational audit logs"
+    },
+    "/blog/{postId}": {
+      "schema": "BlogPost",
+      "description": "Editorial blog posts"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "BackHat AI",
+  "description": "Plataforma SaaS de Inteligência Artificial de elite com mais de 19 ferramentas de geração de texto, código, áudio e vídeo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
