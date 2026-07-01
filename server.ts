@@ -16,6 +16,9 @@ if (!OPENROUTER_API_KEY) {
 
 // API Route for AI Proxy
 app.post("/api/ai", async (req, res) => {
+  if (!OPENROUTER_API_KEY) {
+    return res.status(500).json({ error: "Erro de configuração: OPENROUTER_API_KEY não definida no servidor." });
+  }
   try {
     const { prompt, systemPrompt, toolId, model } = req.body;
 
