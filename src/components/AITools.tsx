@@ -56,6 +56,54 @@ export default function AITools() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
+  // Video Generation Specific States
+  const [videoDuration, setVideoDuration] = useState<number>(10);
+  const [videoVoice, setVideoVoice] = useState<string>("pt-BR-FranciscaNeural");
+  const [videoBackgroundMusic, setVideoBackgroundMusic] = useState<string>("none");
+  const [videoProjectId, setVideoProjectId] = useState<string | null>(null);
+  const [videoStatus, setVideoStatus] = useState<string>("idle"); // idle, rendering, completed, failed
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoPolling, setVideoPolling] = useState<boolean>(false);
+  const [generatedJsonView, setGeneratedJsonView] = useState<any>(null);
+
+  // Poll video status
+  React.useEffect(() => {
+    let intervalId: any;
+    if (videoPolling && videoProjectId) {
+      intervalId = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/video-gen?projectId=${videoProjectId}`);
+          if (res.ok) {
+            const data = await res.json();
+            console.log("[BLACKHAT Video Poll] API Response Data:", data);
+            
+            // Check status in various possible formats
+            const status = data.movie?.status || data.project?.status || data.status;
+            const url = data.movie?.url || data.project?.url || data.url;
+
+            if (status === "completed" || status === "done" || status === "success" || url) {
+              setVideoStatus("completed");
+              setVideoUrl(url);
+              setVideoPolling(false);
+              await updateUsageCounts();
+              await addSystemLog("AI_GENERATE", `Vídeo renderizado com sucesso via JSON2Video.`);
+            } else if (status === "failed") {
+              setVideoStatus("failed");
+              setVideoPolling(false);
+            } else {
+              setVideoStatus("rendering");
+            }
+          }
+        } catch (err) {
+          console.error("Error polling video status:", err);
+        }
+      }, 5000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [videoPolling, videoProjectId]);
+
   // Simple HTML sanitizer/parser for prompt response
   const formatMarkdownResponse = (text: string) => {
     if (!text) return "";
@@ -225,6 +273,49 @@ export default function AITools() {
           await updateUsageCounts();
         }, 2000);
 
+      } else if (activeTool.id === "video-gen") {
+        const res = await fetch("/api/video-gen", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: promptInput,
+            duration: videoDuration,
+            style: mediaStyle,
+            voice: videoVoice,
+            backgroundMusic: videoBackgroundMusic
+          })
+        });
+
+        if (!res.ok) {
+          let errorMessage = "Erro ao solicitar geração de vídeo.";
+          try {
+            const errorText = await res.text();
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.error || errorData.details || errorMessage;
+            } catch {
+              errorMessage = `Erro do servidor (${res.status}): ${errorText.substring(0, 150).replace(/<[^>]*>/g, '').trim()}`;
+            }
+          } catch {
+            errorMessage = `Erro de conexão (${res.status})`;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const data = await res.json();
+        if (data.success && data.projectId) {
+          setVideoProjectId(data.projectId);
+          setVideoStatus("rendering");
+          setGeneratedJsonView(data.generatedJson);
+          setVideoPolling(true); // start polling status
+          setAiResponse(`### Roteiro e Estrutura do Vídeo Iniciados!\n\nSeu vídeo profissional está sendo compilado e renderizado em tempo real nos servidores da JSON2Video.\n\n**ID do Projeto:** \`${data.projectId}\`\n\n*Acompanhe o progresso de renderização ao lado. O processo costuma demorar entre 15 e 60 segundos dependendo da duração e dos elementos gerados pela IA!*`);
+        } else {
+          throw new Error(data.error || "Não foi possível iniciar a renderização do vídeo.");
+        }
+        setIsGenerating(false);
+
       } else {
         // Text tool OpenRouter API Proxy call
         let systemPrompt = "Você é um assistente de inteligência artificial experiente e de alto desempenho chamado BLACKHAT AI. Responda em português de forma extremamente técnica, clara, polida e útil. Use formatação markdown.";
@@ -250,8 +341,20 @@ export default function AITools() {
         });
 
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || errorData.details || "Erro na requisição da API de IA.");
+          let errorMessage = "Erro na requisição da API de IA.";
+          try {
+            const errorText = await res.text();
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.error || errorData.details || errorMessage;
+            } catch {
+              // If it's HTML, extract a clean preview or show status
+              errorMessage = `Erro do servidor (${res.status}): ${errorText.substring(0, 150).replace(/<[^>]*>/g, '').trim() || 'Resposta inválida'}`;
+            }
+          } catch {
+            errorMessage = `Erro de conexão (${res.status})`;
+          }
+          throw new Error(errorMessage);
         }
 
         const data = await res.json();
@@ -480,6 +583,7 @@ export default function AITools() {
                       onChange={(e) => setPromptInput(e.target.value)}
                       placeholder={
                         activeTool.id === "image-gen" ? "Ex: Um astronauta andando a cavalo na lua, estilo realista 3d..." :
+                        activeTool.id === "video-gen" ? "Ex: Crie um vídeo de 15 segundos promovendo um novo hambúrguer artesanal, com foco em ingredientes frescos e queijo derretido..." :
                         activeTool.id === "code-gen" ? "Ex: Escreva um script em Express para conectar no MongoDB..." :
                         "Escreva suas instruções completas para a inteligência artificial..."
                       }
@@ -501,6 +605,68 @@ export default function AITools() {
                         <option value="anime">Anime Fantasia</option>
                         <option value="realistic">Foto Realista</option>
                       </select>
+                    </div>
+                  )}
+
+                  {activeTool.id === "video-gen" && (
+                    <div className="flex flex-col gap-4 bg-zinc-50 dark:bg-zinc-900/30 p-4 border border-zinc-150 dark:border-white/5 rounded-2xl">
+                      <h4 className="text-xs font-black uppercase text-zinc-900 dark:text-cyan-400 font-mono tracking-wider">Configuração do Vídeo</h4>
+                      
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-zinc-700 dark:text-slate-300 uppercase font-mono">Duração Estimada</label>
+                        <select
+                          value={videoDuration}
+                          onChange={(e) => setVideoDuration(Number(e.target.value))}
+                          className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-transparent text-xs text-zinc-850 dark:text-slate-300 focus:outline-none bg-zinc-100 dark:bg-zinc-950"
+                        >
+                          <option value={5}>5 Segundos (Curto/Ad)</option>
+                          <option value={10}>10 Segundos (Padrão)</option>
+                          <option value={15}>15 Segundos (Reel/Story)</option>
+                          <option value={30}>30 Segundos (Completo)</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-zinc-700 dark:text-slate-300 uppercase font-mono">Voz da Narração (TTS)</label>
+                        <select
+                          value={videoVoice}
+                          onChange={(e) => setVideoVoice(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-transparent text-xs text-zinc-850 dark:text-slate-300 focus:outline-none bg-zinc-100 dark:bg-zinc-950"
+                        >
+                          <option value="pt-BR-FranciscaNeural">Português BR - Francisca (Feminina)</option>
+                          <option value="pt-BR-AntonioNeural">Português BR - Antonio (Masculina)</option>
+                          <option value="en-US-JennyNeural">Inglês US - Jenny (Feminina)</option>
+                          <option value="en-US-GuyNeural">Inglês US - Guy (Masculina)</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-zinc-700 dark:text-slate-300 uppercase font-mono">Estilo Visual</label>
+                        <select
+                          value={mediaStyle}
+                          onChange={(e) => setMediaStyle(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-transparent text-xs text-zinc-850 dark:text-slate-300 focus:outline-none bg-zinc-100 dark:bg-zinc-950"
+                        >
+                          <option value="cinematic">Cinemático 3D</option>
+                          <option value="cyberpunk">Cyberpunk Néon</option>
+                          <option value="anime">Anime Animado</option>
+                          <option value="realistic">Realista Fotorrealismo</option>
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-zinc-700 dark:text-slate-300 uppercase font-mono">Trilha de Fundo</label>
+                        <select
+                          value={videoBackgroundMusic}
+                          onChange={(e) => setVideoBackgroundMusic(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-transparent text-xs text-zinc-850 dark:text-slate-300 focus:outline-none bg-zinc-100 dark:bg-zinc-950"
+                        >
+                          <option value="none">Nenhuma (Apenas Narração)</option>
+                          <option value="corporate">Corporativa / Negócios</option>
+                          <option value="electronic">Eletrônica / Futurista</option>
+                          <option value="cinematic">Cinematográfica / Épica</option>
+                        </select>
+                      </div>
                     </div>
                   )}
 
@@ -598,6 +764,86 @@ export default function AITools() {
                         <h4 className="text-xs font-bold text-zinc-900 dark:text-white font-mono">Loop Sintético IA.mid</h4>
                         <p className="text-[9px] text-zinc-500">Sintetizador Web Audio executando frequências senoidais.</p>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Video Generator Visual Workspace */}
+                  {activeTool.id === "video-gen" && (
+                    <div className="flex flex-col gap-4">
+                      {/* Video status is rendering */}
+                      {videoStatus === "rendering" && (
+                        <div className="p-5 bg-cyan-950/15 border border-cyan-500/20 rounded-2xl flex flex-col items-center justify-center text-center gap-3 py-8 animate-pulse">
+                          <RefreshCw className="w-10 h-10 text-cyan-400 animate-spin" />
+                          <h4 className="text-xs font-black text-cyan-400 uppercase font-mono tracking-wider">Renderizando Vídeo na Nuvem...</h4>
+                          <p className="text-[10px] text-zinc-500 dark:text-slate-400 max-w-xs leading-relaxed">
+                            Aguarde. Nossa inteligência artificial está gerando as cenas, as vozes neurais e aplicando as trilhas sonoras especificadas.
+                          </p>
+                          <div className="w-full bg-zinc-850 h-1.5 rounded-full overflow-hidden mt-2">
+                            <div className="bg-cyan-500 h-full rounded-full animate-pulse" style={{ width: "70%" }}></div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Video status is completed */}
+                      {videoStatus === "completed" && videoUrl && (
+                        <div className="flex flex-col gap-3">
+                          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2.5 text-emerald-500 text-[10px] font-bold uppercase font-mono">
+                            <Check className="w-4.5 h-4.5" />
+                            <span>Vídeo renderizado com sucesso!</span>
+                          </div>
+                          
+                          <video
+                            src={videoUrl}
+                            controls
+                            className="w-full rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800"
+                          />
+
+                          <div className="flex gap-2">
+                            <a
+                              href={videoUrl}
+                              download="BLACKHAT_AI_Video.mp4"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex-1 inline-flex items-center justify-center gap-1.5 text-[10px] font-bold text-black bg-cyan-400 hover:bg-cyan-300 px-4 py-2.5 rounded-xl shadow-lg shadow-cyan-400/10 transition-all uppercase tracking-wider font-mono cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" /> Baixar Vídeo MP4
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Video status is failed */}
+                      {videoStatus === "failed" && (
+                        <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-2xl flex flex-col items-center justify-center text-center gap-2 py-8">
+                          <AlertTriangle className="w-10 h-10 text-red-500 animate-bounce" />
+                          <h4 className="text-xs font-black text-red-500 uppercase font-mono tracking-wider">Falha na Renderização</h4>
+                          <p className="text-[10px] text-zinc-500 dark:text-slate-400 max-w-xs leading-relaxed">
+                            Ocorreu um erro ao processar o vídeo na API JSON2Video. Verifique se o roteiro está correto e tente novamente.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Generated JSON blueprint view */}
+                      {generatedJsonView && (
+                        <div className="border border-zinc-150 dark:border-white/5 rounded-xl overflow-hidden mt-2 bg-zinc-950">
+                          <div className="px-3.5 py-2 border-b border-zinc-150 dark:border-white/5 flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase text-zinc-400 tracking-wider font-mono">Blueprint Automação JSON</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(JSON.stringify(generatedJsonView, null, 2));
+                                alert("Roteiro JSON copiado com sucesso!");
+                              }}
+                              className="text-[9px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase font-mono"
+                            >
+                              Copiar JSON
+                            </button>
+                          </div>
+                          <pre className="p-3 text-[9px] text-emerald-400 overflow-x-auto max-h-36 font-mono leading-relaxed">
+                            {JSON.stringify(generatedJsonView, null, 2)}
+                          </pre>
+                        </div>
+                      )}
                     </div>
                   )}
 
