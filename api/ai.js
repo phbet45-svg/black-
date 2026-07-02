@@ -1,6 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   // CORS Configuration
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -49,8 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       "meta-llama/llama-3-8b-instruct:free"
     ];
 
-    let lastError: any = null;
-    let data: any = null;
+    let lastError = null;
+    let data = null;
 
     for (const currentModel of modelsToTry) {
       try {
@@ -80,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.error(`[BLACKHAT AI Vercel] OpenRouter Error with model ${currentModel}:`, errText);
           lastError = new Error(errText);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error(`[BLACKHAT AI Vercel] Exception with model ${currentModel}:`, err);
         lastError = err;
       }
@@ -94,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         details: lastError?.message || lastError || "Falha de conexão" 
       });
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Vercel Serverless Exception:", error);
     return res.status(500).json({ error: "Erro interno do servidor ao processar IA no Vercel", message: error.message });
   }
