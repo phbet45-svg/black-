@@ -250,7 +250,8 @@ export default function AITools() {
         });
 
         if (!res.ok) {
-          throw new Error("Erro na requisição da API de IA.");
+          const errorData = await res.json();
+          throw new Error(errorData.error || errorData.details || "Erro na requisição da API de IA.");
         }
 
         const data = await res.json();

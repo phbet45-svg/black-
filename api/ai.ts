@@ -1,24 +1,29 @@
-import express from "express";
-import path from "path";
-import { createServer as createViteServer } from "vite";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const app = express();
-const PORT = 3000;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS Configuration
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
 
-app.use(express.json());
-
-// OpenRouter API Configuration
-function getOpenRouterApiKey(): string | undefined {
-  return process.env.OPENROUTER_API_KEY;
-}
-
-// API Route for AI Proxy
-app.post("/api/ai", async (req, res) => {
-  const OPENROUTER_API_KEY = getOpenRouterApiKey();
-  if (!OPENROUTER_API_KEY) {
-    console.error("ERRO: OPENROUTER_API_KEY não configurada no servidor.");
-    return res.status(500).json({ error: "Erro de configuração: Chave de API não definida no servidor." });
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método não permitido" });
+  }
+
+  const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+  if (!OPENROUTER_API_KEY) {
+    console.error("ERRO: OPENROUTER_API_KEY não configurada no servidor Vercel.");
+    return res.status(500).json({ error: "Erro de configuração: Chave de API OPENROUTER_API_KEY não definida no painel do Vercel." });
+  }
+
   try {
     const { prompt, systemPrompt, toolId, model } = req.body;
 
@@ -49,13 +54,13 @@ app.post("/api/ai", async (req, res) => {
 
     for (const currentModel of modelsToTry) {
       try {
-        console.log(`[BLACKHAT AI] Requesting OpenRouter with model: ${currentModel}`);
+        console.log(`[BLACKHAT AI Vercel] Requesting OpenRouter with model: ${currentModel}`);
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://ai.studio",
+            "HTTP-Referer": "https://blackhat-ai.vercel.app",
             "X-Title": "BLACKHAT AI"
           },
           body: JSON.stringify({
@@ -68,21 +73,21 @@ app.post("/api/ai", async (req, res) => {
 
         if (response.ok) {
           data = await response.json();
-          console.log(`[BLACKHAT AI] OpenRouter success with model: ${currentModel}`);
+          console.log(`[BLACKHAT AI Vercel] OpenRouter success with model: ${currentModel}`);
           break; // Success! Break the loop
         } else {
           const errText = await response.text();
-          console.error(`[BLACKHAT AI] OpenRouter Error with model ${currentModel}:`, errText);
+          console.error(`[BLACKHAT AI Vercel] OpenRouter Error with model ${currentModel}:`, errText);
           lastError = new Error(errText);
         }
       } catch (err: any) {
-        console.error(`[BLACKHAT AI] Exception with model ${currentModel}:`, err);
+        console.error(`[BLACKHAT AI Vercel] Exception with model ${currentModel}:`, err);
         lastError = err;
       }
     }
 
     if (data) {
-      return res.json(data);
+      return res.status(200).json(data);
     } else {
       return res.status(502).json({ 
         error: "Erro em todos os modelos da API de IA do OpenRouter.", 
@@ -90,31 +95,7 @@ app.post("/api/ai", async (req, res) => {
       });
     }
   } catch (error: any) {
-    console.error("Server API Exception:", error);
-    return res.status(500).json({ error: "Erro interno do servidor ao processar IA", message: error.message });
+    console.error("Vercel Serverless Exception:", error);
+    return res.status(500).json({ error: "Erro interno do servidor ao processar IA no Vercel", message: error.message });
   }
-});
-
-async function startServer() {
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    // In Express v4, use '*'
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[BLACKHAT AI] Server running on http://localhost:${PORT} under ${process.env.NODE_ENV || 'development'} mode`);
-  });
 }
-
-startServer();
