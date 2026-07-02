@@ -127,18 +127,107 @@ app.get("/api/video-gen", async (req, res) => {
   }
 });
 
-// Helper to ensure correct src attribute instead of url for image, audio, and video elements in JSON2Video payload
+// Helper to ensure correct src attribute instead of url, and sanitize string coordinates (e.g. "center") to numeric values
 function fixJson2VideoPayload(payload: any): any {
   if (!payload) return payload;
   if (Array.isArray(payload)) {
     payload.forEach(item => fixJson2VideoPayload(item));
   } else if (typeof payload === "object") {
+    // 1. Convert url to src for image/audio/video
     if (payload.type && ["image", "audio", "video"].includes(payload.type)) {
       if (payload.url && !payload.src) {
         payload.src = payload.url;
         delete payload.url;
       }
     }
+
+    // 2. Fix x and y positioning to be integers (mandatory for JSON2Video)
+    if (payload.type) {
+      const type = payload.type;
+      const fontSize = Number(payload["font-size"] || payload.fontSize || 40);
+
+      // Handle X
+      if ("x" in payload) {
+        const valX = payload.x;
+        if (typeof valX === "string") {
+          const lowerX = valX.toLowerCase().trim();
+          if (lowerX === "center" || lowerX === "middle") {
+            if (type === "image" || type === "video") {
+              payload.x = 0;
+            } else if (type === "text") {
+              const textLen = (payload.text || "").length;
+              payload.x = Math.max(40, Math.round((1280 - (textLen * fontSize * 0.55)) / 2));
+            } else {
+              payload.x = 100;
+            }
+          } else if (lowerX === "left") {
+            payload.x = 50;
+          } else if (lowerX === "right") {
+            if (type === "text") {
+              const textLen = (payload.text || "").length;
+              payload.x = Math.max(40, Math.round(1280 - (textLen * fontSize * 0.55) - 50));
+            } else {
+              payload.x = 800;
+            }
+          } else {
+            const parsed = parseInt(valX, 10);
+            payload.x = isNaN(parsed) ? 100 : parsed;
+          }
+        } else if (typeof valX !== "number") {
+          payload.x = 100;
+        }
+      } else {
+        if (type === "image" || type === "video") {
+          payload.x = 0;
+        } else if (type === "text") {
+          payload.x = 100;
+        }
+      }
+
+      // Handle Y
+      if ("y" in payload) {
+        const valY = payload.y;
+        if (typeof valY === "string") {
+          const lowerY = valY.toLowerCase().trim();
+          if (lowerY === "center" || lowerY === "middle") {
+            if (type === "image" || type === "video") {
+              payload.y = 0;
+            } else if (type === "text") {
+              payload.y = Math.max(40, Math.round((720 - fontSize) / 2));
+            } else {
+              payload.y = 100;
+            }
+          } else if (lowerY === "top") {
+            payload.y = 80;
+          } else if (lowerY === "bottom") {
+            payload.y = 600;
+          } else {
+            const parsed = parseInt(valY, 10);
+            payload.y = isNaN(parsed) ? 100 : parsed;
+          }
+        } else if (typeof valY !== "number") {
+          payload.y = 100;
+        }
+      } else {
+        if (type === "image" || type === "video") {
+          payload.y = 0;
+        } else if (type === "text") {
+          payload.y = 100;
+        }
+      }
+
+      // Ensure width/height for image and video
+      if (type === "image" || type === "video") {
+        if (!payload.width || typeof payload.width === "string") {
+          payload.width = 1280;
+        }
+        if (!payload.height || typeof payload.height === "string") {
+          payload.height = 720;
+        }
+      }
+    }
+
+    // Recurse to children
     for (const key in payload) {
       if (Object.prototype.hasOwnProperty.call(payload, key)) {
         fixJson2VideoPayload(payload[key]);

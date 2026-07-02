@@ -87,7 +87,7 @@ export default function AITools() {
               setVideoPolling(false);
               await updateUsageCounts();
               await addSystemLog("AI_GENERATE", `Vídeo renderizado com sucesso via JSON2Video.`);
-            } else if (status === "failed") {
+            } else if (status === "failed" || status === "error") {
               setVideoStatus("failed");
               setVideoPolling(false);
             } else {
